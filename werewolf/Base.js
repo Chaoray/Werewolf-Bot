@@ -1,9 +1,9 @@
 
 class Manager {
-    items = {};
+    items = new Map();
 
     constructor(items) {
-        this.items = items || {};
+        this.items = new Map(items) || this.items;
     }
 
     /**
@@ -14,57 +14,34 @@ class Manager {
      */
     add(key, value) {
         if (!this.has(key)) {
-            this.items[key] = value;
-            return this.items[key];
+            this.items.set(key, value);
+            return this.items.get(key);
         }
     }
 
     remove(key) {
-        if (this.has(key)) {
-            delete this.items[key];
-            return true;
-        }
-        return false;
+        return this.items.delete(key);
     }
 
     has(key) {
-        return this.items.hasOwnProperty(key);
+        return this.items.has(key);
     }
 
     get(key) {
-        return this.items[key];
+        return this.items.get(key);
     }
 
     /**
-     * set the value of the given key, if exists
+     * set the value of the given key
      * @param {*} key key
      * @param {*} value value
-     * @return {*}
      */
     set(key, value) {
-        if (this.has(key)) {
-            this.items[key] = value;
-        }
-
-        return this.items[key];
-    }
-
-    /**
-     * set the value of the given key whether it exists or not
-     * @param {*} key key
-     * @param {*} value value
-     * @return {*} value that was set
-     */
-    u_set(key, value) {
-        this.items[key] = value;
-        return this.items[key];
+        this.items.set(key, value);
     }
 
     get length() {
-        const symbols = Object.getOwnPropertySymbols(this.items).length;
-        const keys = Object.getOwnPropertyNames(this.items).length;
-
-        return symbols + keys;
+        return this.items.size;
     }
 
 
@@ -78,11 +55,11 @@ class Manager {
     }
 
     get keys() {
-        return Object.keys(this.items);
+        return Array.from(this.items.keys());
     }
 
     get values() {
-        return Object.values(this.items);
+        return Array.from(this.items.values());
     }
 
     /**
@@ -90,15 +67,15 @@ class Manager {
      * @return {Object[]} entries shuffled
      */
     shuffle() {
-        const entries = Object.entries(this.items);
+        const values = Array.from(this.values);
 
-        for (let i = entries.length - 1; i > 0; i--) {
+        for (let i = values.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             // eslint-disable-next-line comma-dangle, no-unused-vars
-            [entries[i], entries[j]] = [entries[j], entries[i]];
+            [values[i], values[j]] = [values[j], values[i]];
         }
 
-        return entries;
+        return values;
     }
 
 
@@ -109,13 +86,11 @@ class Manager {
     filter(fn) {
         const res = {};
 
-        for (const key in this.items) {
-            if (!this.items.hasOwnProperty(key)) continue;
-
-            if (fn(this.items[key])) {
-                res[key] = this.items[key];
+        this.items.forEach((value, key) => {
+            if (fn(value)) {
+                res[key] = value;
             }
-        }
+        });
         return res;
     }
 
@@ -125,24 +100,20 @@ class Manager {
      */
     map(fn) {
         const res = {};
-        for (const key in this.items) {
-            if (!this.items.hasOwnProperty(key)) continue;
-
-            res[key] = fn(this.items[key]);
-        }
+        this.items.forEach((value, key) => {
+            res[key] = fn(value);
+        });
 
         return res;
     }
 
     /**
-     * @param {function} cb callback function
+     * @param {function} fn callback function
      */
-    forEach(cb) {
-        for (const key in this.items) {
-            if (!this.items.hasOwnProperty(key)) continue;
-
-            cb(this.items[key]);
-        }
+    forEach(fn) {
+        this.items.forEach((value) => {
+            fn(value);
+        });
     }
 
     /**
@@ -150,14 +121,15 @@ class Manager {
      * @return {Object}
      */
     copy() {
-        return JSON.parse(JSON.stringify(this.items));
+        return new Manager(this.items);
     }
 
     entires() {
-        return Object.entries(this.items);
+        return this.items.entries();
     }
+
     clear() {
-        this.items = {};
+        this.items.clear();
     }
 }
 

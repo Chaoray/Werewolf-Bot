@@ -3,11 +3,11 @@ import { gameManager } from '../handler/GameHandler.js';
 
 const data = new SlashCommandBuilder()
     .setName('vote')
-    .setDescription('票人')
+    .setDescription('票人，既然投過票就不能再更改')
     .addUserOption((option) =>
         option
             .setName('target')
-            .setDescription('技能指定的玩家')
+            .setDescription('指定的玩家')
             .setRequired(true)
     );
 
@@ -25,7 +25,7 @@ async function execute(interaction) {
 
     const game = gameManager.getGameFromPlayerId(interaction.member.id);
 
-    const target = interaction.options.getUser('target');
+    let target = interaction.options.getUser('target');
 
     if (game === null) {
         await interaction.reply({
@@ -74,13 +74,36 @@ async function execute(interaction) {
         return;
     }
 
+    if (target.character.isDead) {
+        await interaction.reply({
+            content: `對象已死亡`,
+            ephemeral: true,
+        });
+        return;
+    }
+
+    if (game.votes.has(player.id)) {
+        await interaction.reply({
+            content: `親, 你已經投過票了`,
+            ephemeral: true,
+        });
+        return;
+    }
+
     game.votes.setState(player, target);
 
     await interaction.reply({
-        content: `投票人數: ${game.votes.count}/${game.players.length}`,
+        content: `投票人數: ${game.votes.length}/${game.players.length}`,
     });
 
-    // TODO: 投票完成踢人+進入下一階段/判斷輸贏
+    if (game.votes.length == game.players.length) {
+        const result = game.votes.result;
+        result.character.kill({ game: game, });
+        game.channel.send(`被票出的人是 <@${result.id}>`);
+
+        game.phase.next();
+        game.continue();
+    }
 }
 
 

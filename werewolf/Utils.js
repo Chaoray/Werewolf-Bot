@@ -1,16 +1,12 @@
-class Enum {
-    /**
-     * @param  {...String[]} args items
-     * @return {Object}
-     */
-    static create(...args) {
-        return Object.freeze(
-            // eslint-disable-next-line comma-dangle
-            Object.fromEntries(args.map((value) => [value, Symbol(value)]))
-        );
+import fs from 'fs';
+
+class JsonFile {
+    static load(filePath) {
+        const data = fs.readFileSync(filePath, 'utf-8');
+        return JSON.parse(data.toString());
     }
 }
 
 export {
-    Enum
+    JsonFile
 };

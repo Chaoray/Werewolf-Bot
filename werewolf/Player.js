@@ -13,14 +13,10 @@ class Player {
 class PlayerManager extends Manager {
     /**
      * @param {string} id player id
-     * @return {Player} if success return player, otherwise return null
      */
     add(id) {
-        if (!this.items[id]) {
-            this.items[id] = new Player(id);
-            return this.items[id];
-        } else {
-            return null;
+        if (!this.has(id)) {
+            this.items.set(id, new Player(id));
         }
     }
 }

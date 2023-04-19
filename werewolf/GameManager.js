@@ -29,10 +29,7 @@ class GameManager extends Manager {
      * @return {Game} Game instance if succeeded, null otherwise
      */
     getGameFromPlayerId(playerId) {
-        for (const id of this.keys) {
-            if (!this.has(id)) continue;
-
-            const game = this.get(id);
+        for (const game of this.values) {
             if (game.players.has(playerId)) {
                 return game;
             }

@@ -16,14 +16,9 @@ class ReadyManager extends Manager {
      * 讓玩家準備
      * @param {string} id player id
      * @param {boolean} state whether the player is ready or not
-     * @return {number} number of players that are ready
      */
     setState(id, state) {
-        this.ready.u_set(id, state);
-
-        const filteredPlayers = this.ready.filter((flag) => flag);
-
-        return Object.keys(filteredPlayers).length;
+        this.set(id, state);
     }
 }
 
@@ -102,7 +97,7 @@ class Game {
         }
 
         // eslint-disable-next-line no-unused-vars, comma-dangle
-        const shuffledPlayers = this.players.shuffle().map(([k, v]) => v);
+        const shuffledPlayers = this.players.shuffle();
         const characterSymbols = this.config.toList();
 
         for (let i = 0; i < shuffledPlayers.length; i++) {
@@ -123,6 +118,7 @@ class Game {
         this.channel.send(this.deathLog.log);
         this.deathLog.reset();
         this.votes.clear();
+        this.ready.clear();
     }
 
     continue() {
@@ -142,13 +138,13 @@ class Game {
             this.channel.send(`${message.start}` + prompt);
         }
 
+        if (this.phase.state === GamePhaseDefinitions.Day) {
+            this.onDay();
+        }
+
         const timerId = setTimeout(() => {
             if (message.end !== '') {
                 this.channel.send(message.end);
-            }
-
-            if (this.phase.state === GamePhaseDefinitions.Day) {
-                this.onDay();
             }
 
             this.phase.next();
@@ -159,7 +155,7 @@ class Game {
             clearTimeout(timerId);
         }
 
-        // TODO: 等待投票
+        // TODO: 等待白天討論 -> 進投票
     }
 }
 

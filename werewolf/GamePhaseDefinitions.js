@@ -32,7 +32,7 @@ const GamePhaseProperties = Object.freeze({
         character: CharacterDefinitions.Hunter,
     },
     [GamePhaseDefinitions.Day]: {
-        skip: true,
+        wait: true,
     },
     [GamePhaseDefinitions.Voting]: {
         wait: true,
@@ -69,7 +69,7 @@ const GamePhaseMessage = Object.freeze({
         end: '',
     },
     [GamePhaseDefinitions.Voting]: {
-        start: '請選出一位要驅逐的對象',
+        start: '用/vote選出一位要驅逐的對象',
         end: '',
     },
     [GamePhaseDefinitions.End]: {

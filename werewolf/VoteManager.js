@@ -5,37 +5,34 @@ class VoteManager extends Manager {
      * 設定投票狀態
      * @param {Player} player 投票player instance
      * @param {Player} target 目標玩家
+     * @return {Number} count of total votes
      */
     setState(player, target) {
-        this.u_set(player.id, target);
-    }
-
-    get count() {
-        return Object.keys(this.filter((target) => target)).length;
+        this.add(player.id, target);
+        return this.length;
     }
 
     get result() {
-        const targets = this.values;
+        const eachCount = {};
 
-        let res = targets[0];
-        let count = 1;
+        let maxCount = 0;
+        let res;
+        for (const target of this.values) {
+            const id = target.id;
 
-        for (const i in targets) {
-            if (i == 0) continue;
-
-            if (res === targets[i]) {
-                count++;
-            } else if (count > 0) {
-                count--;
+            if (eachCount[id]) {
+                eachCount[id]++;
             } else {
-                res = targets[i];
-                count++;
+                eachCount[id] = 1;
+            }
+
+            if (eachCount[id] > maxCount) {
+                maxCount = eachCount[id];
+                res = target;
             }
         }
 
         return res;
-
-        // TODO: 計算被投票最多的人
     }
 }
 

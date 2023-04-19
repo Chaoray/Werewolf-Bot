@@ -52,10 +52,10 @@ async function execute(interaction) {
         return;
     }
 
-    const count = game.ready.setState(interaction.member.id, isReady);
+    game.ready.setState(interaction.member.id, isReady);
 
     await interaction.reply({
-        content: `準備開始遊戲(${count}/${game.players.length})`,
+        content: `準備開始遊戲(${game.ready.count}/${game.players.length})`,
     });
 }
 

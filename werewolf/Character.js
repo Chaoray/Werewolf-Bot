@@ -2,21 +2,13 @@ import { Skill } from './Skill.js';
 import { CharacterDefinitions, TeamDefinitions } from './CharacterDefinitions.js';
 
 class Character {
-    id = '';
     type;
     team;
     isDead = false;
     skill = new Skill();
 
-    constructor(id) {
-        this.id = id;
-    }
-
-    kill(params) {
-        this.isDead = this.skill.die(params);
-
-        // TODO: OnKill event?
-        // let id = EventManager.addListener(type, scope, callback);
+    kill(...args) {
+        this.isDead = this.skill.die(...args);
     }
 }
 
@@ -41,7 +33,15 @@ class Hunter extends Character {
     team = TeamDefinitions.Good;
 
     static HunterSkill = class extends Skill {
-        die() { }
+        /**
+         * @param {Object} obj
+         * @param {Game} obj.game game instance
+         * @param {Player} obj.target player instance
+         * @throws {Error} 執行錯誤
+         */
+        die({ game, }) {
+
+        }
     };
 
     skill = new Hunter.HunterSkill();
@@ -52,6 +52,11 @@ class Witch extends Character {
     team = TeamDefinitions.Good;
 
     static WitchSkill = class extends Skill {
+        potions = {
+            heal: 1,
+            poison: 1,
+        };
+
         /**
          * @param {Object} obj
          * @param {Game} obj.game game instance
@@ -69,26 +74,38 @@ class Witch extends Character {
                 throw new Error('已經用過技能了');
             }
 
-            if (!target) {
-                throw new Error('所指定的玩家不存在');
-            }
-
             switch (choice) {
                 case 1: { // 查看死亡
                     return game.deathLog.log;
                 }
 
                 case 2: { // 使用解藥
+                    if (this.potions.heal <= 0) {
+                        throw new Error('本局遊戲已經使用過解藥');
+                    }
+
+                    if (!target) {
+                        throw new Error('所指定的玩家不存在');
+                    }
+
                     game.deathLog.remove(target);
                     target.isDead = false;
                     this.count++;
+                    this.potions.heal = 0;
+
                     return `你對<@${target.id}>使用了解藥`;
                 }
 
                 case 3: { // 使用毒藥
+                    if (this.potions.heal <= 0) {
+                        throw new Error('本局遊戲已經使用過毒藥');
+                    }
+
                     game.deathLog.add(target);
-                    target.kill();
+                    target.kill({ game: game, });
                     this.count++;
+                    this.potions.poison = 0;
+
                     return `你對<@${target.id}>使用了毒藥`;
                 }
 
@@ -160,7 +177,7 @@ class Werewolf extends Character {
                 throw new Error('所指定的玩家不存在');
             }
 
-            target.character.kill();
+            target.character.kill({ game: game, });
             this.count++;
             return `<@${target.id}> 被殺了`;
         }
