@@ -46,8 +46,7 @@ class Manager {
 
 
     /**
-     * This getter should be overridden by subclasses
-     * Instead of using it directly
+     * 應該被子類複寫，未複寫不要直接用
      * @return {number}
      */
     get count() {
@@ -63,16 +62,16 @@ class Manager {
     }
 
     /**
-     * Shuffle the items
+     * 打亂items
      * @return {Object[]} entries shuffled
      */
     shuffle() {
-        const values = Array.from(this.values);
+        const values = this.values;
 
+        // Fisher–Yates shuffle: https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
         for (let i = values.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
-            // eslint-disable-next-line comma-dangle, no-unused-vars
-            [values[i], values[j]] = [values[j], values[i]];
+            [values[i], values[j],] = [values[j], values[i],]; // swap
         }
 
         return values;

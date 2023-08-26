@@ -1,9 +1,6 @@
 import { Game } from './Game.js';
 import { Manager } from './Base.js';
 
-/**
- * GameManager for Werewolf Games.
- */
 class GameManager extends Manager {
     /**
      * create a new game
@@ -15,7 +12,7 @@ class GameManager extends Manager {
         const game = new Game(channel);
 
         for (const id of playerIds) {
-            game.players.add(id);
+            game.players.add(id); // 填充玩家
         }
 
         this.add(game.id, game);

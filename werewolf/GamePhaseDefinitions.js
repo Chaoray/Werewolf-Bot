@@ -17,7 +17,7 @@ const GamePhaseDefinitions = Object.freeze({
     'Voting': Symbol('Voting'),
 });
 
-const GamePhaseProperties = Object.freeze({
+const GamePhaseProperties = Object.freeze({ // on function 這裡會綁定this成game，可以到Game.js的continue()看
     [GamePhaseDefinitions.Night]: {
         skip: true,
     },

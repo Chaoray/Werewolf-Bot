@@ -9,7 +9,7 @@ class GamePhaseManager {
 
     next() {
         this.state = GamePhaseCycle[
-            (GamePhaseCycle.indexOf(this.state) + 1) % GamePhaseCycle.length // to next phase and cycling
+            (GamePhaseCycle.indexOf(this.state) + 1) % GamePhaseCycle.length // 前往循環中下個階段
         ];
 
         // TODO: 判斷輸贏

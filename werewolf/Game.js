@@ -14,7 +14,7 @@ class ReadyManager extends Manager {
     /**
      * 讓玩家準備
      * @param {string} id player id
-     * @param {boolean} state whether the player is ready or not
+     * @param {boolean} state 準備狀態
      */
     setState(id, state) {
         this.set(id, state);
@@ -30,7 +30,14 @@ class DeathLog {
             result += `<@${player.id}> 死了\n`;
         });
 
-        if (result === '') result = '昨晚是平安夜';
+        /*
+        例：
+        @PlayerA 死了
+        @PlayerB 死了
+        @PlayerC 死了
+        */
+
+        if (this.death.length === 0) result = '昨晚是平安夜';
 
         return result;
     }
@@ -67,22 +74,14 @@ class Game {
     votes = new VoteManager();
 
     /**
-     * @param {TextChannel} channel discord channel instance
+     * @param {TextChannel} channel
      */
     constructor(channel) {
         this.id = nanoid();
         this.channel = channel;
         this.channelId = channel.id;
-
-        for (const type of this.config.types) {
-            this.characters[type] = {};
-        }
     }
 
-    /**
-     * 檢查遊戲是否在遊玩狀態
-     * @return {boolean} true if the game has started, false otherwise
-     */
     isGamePlaying() {
         return this.phase.isPlaying();
     }
@@ -125,7 +124,7 @@ class Game {
         const waitMS = this.phase.properties.skip ? this.config.skipSeconds * 1000 : this.config.waitSeconds * 1000;
 
         if (message.start !== '') {
-            const prompt = this.phase.properties.character ? `, 有${this.config.waitSeconds}秒可以使用/skill` : '';
+            const prompt = this.phase.properties.character ? `, 有${this.config.waitSeconds}秒可以使用/skill` : ''; // 是某角色睜眼時外加使用技能提示
             this.channel.send(`${message.start}` + prompt);
         }
 
@@ -133,7 +132,7 @@ class Game {
             this.phase.properties.on.bind(this)(); // TODO: 到底要不要傳game過去
         }
 
-        const timerId = setTimeout(() => {
+        const timerId = setTimeout(() => { // 自動往下個階段移動
             if (message.end !== '') {
                 this.channel.send(message.end);
             }

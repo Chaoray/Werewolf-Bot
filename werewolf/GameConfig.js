@@ -3,14 +3,14 @@ class GameConfig {
     static Default = new GameConfig();
 
     characterTypes = []; // TODO: 計畫改掉types?
-    numberOfCharacters = {}; // the number of each character set in the game
+    numberOfCharacters = {}; // 每個角色的數量
     waitSeconds = 15;
     skipSeconds = 2.5;
     totalCharacterCount = 0;
 
     /**
      * constructor
-     * @param {string} types any combination of types of CharacterDefines and so on
+     * @param {Array} types 任何角色定義的組合陣列
      */
     constructor(types) {
         this.characterTypes = types ? types : this.characterTypes;
@@ -39,7 +39,7 @@ class GameConfig {
     }
 
     /**
-     * count the number of characters
+     * 計算角色總數
      * @return {number} the number of characters
      */
     count() {
