@@ -9,17 +9,14 @@ class GamePhaseManager {
 
     next() {
         this.state = GamePhaseCycle[
-            (GamePhaseCycle.indexOf(this.state) + 1) % GamePhaseCycle.length
+            (GamePhaseCycle.indexOf(this.state) + 1) % GamePhaseCycle.length // to next phase and cycling
         ];
 
         // TODO: 判斷輸贏
     }
 
     isPlaying() {
-        if (this.state != GamePhaseDefinitions.Idle && this.state != GamePhaseDefinitions.End) {
-            return true;
-        }
-        return false;
+        return this.state != GamePhaseDefinitions.Idle && this.state != GamePhaseDefinitions.End;
     }
 
     get message() {

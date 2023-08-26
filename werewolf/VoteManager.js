@@ -17,7 +17,7 @@ class VoteManager extends Manager {
 
         let maxCount = 0;
         let res;
-        for (const target of this.values) {
+        for (const target of this.values) { // find player that has most votes
             const id = target.id;
 
             if (eachCount[id]) {

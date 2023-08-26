@@ -1,5 +1,7 @@
 import { CharacterDefinitions } from './CharacterDefinitions.js';
 
+// TODO: 讓這裡變得好看億點
+
 const GamePhaseDefinitions = Object.freeze({
     'Idle': Symbol('Idle'),
     'End': Symbol('End'),
@@ -21,6 +23,9 @@ const GamePhaseProperties = Object.freeze({
     },
     [GamePhaseDefinitions.Werewolf]: {
         character: CharacterDefinitions.Werewolf,
+        manual: true,
+        on: function() {
+        },
     },
     [GamePhaseDefinitions.Witch]: {
         character: CharacterDefinitions.Witch,
@@ -32,10 +37,25 @@ const GamePhaseProperties = Object.freeze({
         character: CharacterDefinitions.Hunter,
     },
     [GamePhaseDefinitions.Day]: {
-        wait: true,
+        manual: true,
+        on: function() {
+            this.channel.send(this.deathLog.outputLog());
+            this.deathLog.reset();
+            this.votes.clear();
+            this.ready.clear();
+
+            this.channel.send('依照順序發言，發言完後打/ready');
+            let speakOrder = '';
+            this.players.forEach((player) => {
+                if (!player.character.isDead) {
+                    speakOrder += `<@${player.id}>`;
+                }
+            });
+            this.channel.send(speakOrder);
+        },
     },
     [GamePhaseDefinitions.Voting]: {
-        wait: true,
+        manual: true,
     },
 });
 
@@ -49,7 +69,7 @@ const GamePhaseMessage = Object.freeze({
         end: '',
     },
     [GamePhaseDefinitions.Werewolf]: {
-        start: '狼人請睜眼',
+        start: '狼人請睜眼，用/skill選出一位要殺死的對象',
         end: '狼人請閉眼',
     },
     [GamePhaseDefinitions.Witch]: {

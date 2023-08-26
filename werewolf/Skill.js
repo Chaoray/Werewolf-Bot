@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 class Skill {
     count = 0;
 
@@ -20,6 +21,13 @@ class Skill {
     }
 }
 
+class SkillError extends Error {
+    constructor(message) {
+        super(message, options);
+    }
+}
+
+
 export {
-    Skill
+    Skill, SkillError
 };

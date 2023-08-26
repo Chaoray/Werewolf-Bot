@@ -41,11 +41,9 @@ async function execute(interaction) {
     }
 
     if (interaction.channelId !== game.channelId) {
-        interaction.client.channels.fetch(game.channelId).then(async (channel) => {
-            await interaction.reply({
-                content: `請在遊戲創建頻道 ${channel.toString()} 使用指令`,
-                ephemeral: true,
-            });
+        await interaction.reply({
+            content: `請在遊戲創建頻道 ${interaction.channel.toString()} 使用指令`,
+            ephemeral: true,
         });
         return;
     }
