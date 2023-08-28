@@ -21,7 +21,7 @@ class Villager extends Character {
          * @return {string} 使用結果
          */
         use() {
-            return '夢中甚麼都有呢';
+            return '夢中什麼都有呢';
         }
     };
 
@@ -76,6 +76,9 @@ class Witch extends Character {
 
             switch (choice) {
                 case 1: { // 查看死亡
+                    if (this.potions.heal <= 0) {
+                        throw new Error('本局遊戲已經使用過解藥，故無法查看刀口');
+                    }
                     return game.deathLog.log;
                 }
 

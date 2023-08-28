@@ -11,7 +11,6 @@ const CharacterDefinitions = Object.freeze({
 const TeamDefinitions = Object.freeze({
     Good: Symbol('Good'),
     Bad: Symbol('Bad'),
-    Third: Symbol('Third'),
 });
 
 export {
