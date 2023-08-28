@@ -1,4 +1,5 @@
-import { Skill } from './Skill.js';
+/* eslint-disable no-unused-vars */
+import { Skill, SkillError } from './Skill.js';
 import { CharacterDefinitions, TeamDefinitions } from './CharacterDefinitions.js';
 
 class Character {
@@ -37,10 +38,10 @@ class Hunter extends Character {
          * @param {Object} obj
          * @param {Game} obj.game game instance
          * @param {Player} obj.target player instance
-         * @throws {Error} 執行錯誤
+         * @throws {SkillError} 執行錯誤
          */
         die({ game, }) {
-
+            // TODO: 帶人
         }
     };
 
@@ -63,15 +64,15 @@ class Witch extends Character {
          * @param {Player} obj.target player instance
          * @param {Number} obj.choice 1:查看死亡 2:解藥 3:毒藥
          * @return {string} 使用結果
-         * @throws {Error} 執行錯誤
+         * @throws {SkillError} 執行錯誤
          */
         use({ game, target, choice, }) {
             if (game.phase.properties.character !== this.type) {
-                throw new Error('非技能使用時間');
+                throw new SkillError('非技能使用時間');
             }
 
             if (this.count > 0) {
-                throw new Error('已經用過技能了');
+                throw new SkillError('已經用過技能了');
             }
 
             switch (choice) {
@@ -79,16 +80,16 @@ class Witch extends Character {
                     if (this.potions.heal <= 0) {
                         throw new Error('本局遊戲已經使用過解藥，故無法查看刀口');
                     }
-                    return game.deathLog.log;
+                    return game.deathLog.outputLog();
                 }
 
                 case 2: { // 使用解藥
                     if (this.potions.heal <= 0) {
-                        throw new Error('本局遊戲已經使用過解藥');
+                        throw new SkillError('本局遊戲已經使用過解藥');
                     }
 
                     if (!target) {
-                        throw new Error('所指定的玩家不存在');
+                        throw new SkillError('所指定的玩家不存在');
                     }
 
                     game.deathLog.remove(target);
@@ -100,8 +101,8 @@ class Witch extends Character {
                 }
 
                 case 3: { // 使用毒藥
-                    if (this.potions.heal <= 0) {
-                        throw new Error('本局遊戲已經使用過毒藥');
+                    if (this.potions.poison <= 0) {
+                        throw new SkillError('本局遊戲已經使用過毒藥');
                     }
 
                     game.deathLog.add(target);
@@ -113,7 +114,7 @@ class Witch extends Character {
                 }
 
                 default: {
-                    throw new Error('不要輸入不存在的選項');
+                    throw new SkillError('不要輸入不存在的選項');
                 }
             }
         }
@@ -132,19 +133,19 @@ class Seer extends Character {
          * @param {Game} obj.game game instance
          * @param {Player} obj.target player instance
          * @return {string} 使用結果
-         * @throws {Error} 執行錯誤
+         * @throws {SkillError} 執行錯誤
          */
         use({ game, target, }) {
             if (game.phase.properties.character !== this.type) {
-                throw new Error('非技能使用時間');
+                throw new SkillError('非技能使用時間');
             }
 
             if (this.count > 0) {
-                throw new Error('已經用過技能了');
+                throw new SkillError('已經用過技能了');
             }
 
             if (!target) {
-                throw new Error('所指定的玩家不存在');
+                throw new SkillError('所指定的玩家不存在');
             }
 
             this.count++;
@@ -165,24 +166,27 @@ class Werewolf extends Character {
          * @param {Game} obj.game game instance
          * @param {Player} obj.target player instance
          * @return {string} 使用結果
-         * @throws {Error} 執行錯誤
+         * @throws {SkillError} 執行錯誤
          */
         use({ game, target, }) {
             if (game.phase.properties.character != this.type) {
-                throw new Error('非技能使用時間');
+                throw new SkillError('非技能使用時間');
             }
 
             if (this.count > 0) {
-                throw new Error('已經用過技能了');
+                throw new SkillError('已經用過技能了');
             }
 
             if (!target) {
-                throw new Error('所指定的玩家不存在');
+                // TODO: 使用技能沒目標可以查看狼隊友
+                throw new SkillError('所指定的玩家不存在');
             }
 
             target.character.kill({ game: game, });
             this.count++;
             return `<@${target.id}> 被殺了`;
+
+            // TODO: 狼人陣營只能殺一人
         }
     };
 
@@ -192,11 +196,39 @@ class Werewolf extends Character {
 class BlackWolf extends Character {
     type = CharacterDefinitions.BlackWolf;
     team = TeamDefinitions.Bad;
+
+    static BlackWolfSkill = class extends Werewolf.WerewolfSkill {
+        /**
+         * @param {Object} obj
+         * @param {Game} obj.game game instance
+         * @param {Player} obj.target player instance
+         * @throws {SkillError} 執行錯誤
+         */
+        die({ game, }) {
+            // 帶人
+        }
+    };
+
+    skill = new BlackWolf.BlackWolfSkill();
 }
 
 class WhiteWolf extends Character {
     type = CharacterDefinitions.WhiteWolf;
     team = TeamDefinitions.Bad;
+
+    static WhiteWolfSkill = class extends Werewolf.WerewolfSkill {
+        /**
+         * @param {Object} obj
+         * @param {Game} obj.game game instance
+         * @param {Player} obj.target player instance
+         * @throws {Error} 執行錯誤
+         */
+        die({ game, }) {
+            // 帶人
+        }
+    };
+
+    skill = new WhiteWolf.WhiteWolfSkill();
 }
 
 const CharacterClasses = {

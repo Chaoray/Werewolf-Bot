@@ -9,7 +9,7 @@ class VoteManager extends Manager {
      */
     setState(player, target) {
         this.add(player.id, target);
-        return this.length;
+        return this.length; // ????????????
     }
 
     get result() {
@@ -17,7 +17,7 @@ class VoteManager extends Manager {
 
         let maxCount = 0;
         let res;
-        for (const target of this.values) {
+        for (const target of this.values) { // 找到最多票的玩家
             const id = target.id;
 
             if (eachCount[id]) {
@@ -31,6 +31,9 @@ class VoteManager extends Manager {
                 res = target;
             }
         }
+
+        // 附註：可以隨機選 / 重新投
+        // 目前是隨機選
 
         return res;
     }

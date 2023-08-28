@@ -15,9 +15,7 @@ class PlayerManager extends Manager {
      * @param {string} id player id
      */
     add(id) {
-        if (!this.has(id)) {
-            this.items.set(id, new Player(id));
-        }
+        this.items.add(id, new Player(id));
     }
 }
 

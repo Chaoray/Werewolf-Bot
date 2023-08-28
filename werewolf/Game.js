@@ -4,7 +4,6 @@ import { CharacterClasses } from './Character.js';
 import { GameConfig } from './GameConfig.js';
 import { PlayerManager } from './Player.js';
 import { GamePhaseManager } from './GamePhase.js';
-import { GamePhaseDefinitions } from './GamePhaseDefinitions.js';
 import { VoteManager } from './VoteManager.js';
 
 class ReadyManager extends Manager {
@@ -15,7 +14,7 @@ class ReadyManager extends Manager {
     /**
      * 讓玩家準備
      * @param {string} id player id
-     * @param {boolean} state whether the player is ready or not
+     * @param {boolean} state 準備狀態
      */
     setState(id, state) {
         this.set(id, state);
@@ -31,7 +30,14 @@ class DeathLog {
             result += `<@${player.id}> 死了\n`;
         });
 
-        if (result === '') result = '昨晚是平安夜';
+        /*
+        例：
+        @PlayerA 死了
+        @PlayerB 死了
+        @PlayerC 死了
+        */
+
+        if (this.death.length === 0) result = '昨晚是平安夜';
 
         return result;
     }
@@ -58,7 +64,7 @@ class DeathLog {
 class Game {
     id;
     channelId;
-    channel; // 非常之Illegal
+    channel;
 
     phase = new GamePhaseManager();
     config = new GameConfig();
@@ -68,35 +74,26 @@ class Game {
     votes = new VoteManager();
 
     /**
-     * @param {TextChannel} channel discord channel instance
+     * @param {TextChannel} channel
      */
     constructor(channel) {
         this.id = nanoid();
         this.channel = channel;
         this.channelId = channel.id;
-
-        for (const type of this.config.types) {
-            this.characters[type] = {};
-        }
     }
 
-    /**
-     * 檢查遊戲是否在遊玩狀態
-     * @return {boolean} true if the game has started, false otherwise
-     */
     isGamePlaying() {
         return this.phase.isPlaying();
     }
 
     /**
-     * distribute characters to all players randomly
+     * 隨機分配玩家角色
      */
     distributeCharacters() {
         if (this.players.length !== this.config.total) {
-            throw new Error('角色數量需等於玩家數量');
+            throw new RangeError('角色數量需等於玩家數量');
         }
 
-        // eslint-disable-next-line no-unused-vars, comma-dangle
         const shuffledPlayers = this.players.shuffle();
         const characterSymbols = this.config.toList();
 
@@ -107,18 +104,11 @@ class Game {
 
     start() {
         if (this.players.length !== this.ready.count) {
-            throw new Error('準備玩家數量需等於總玩家數');
+            throw new RangeError('準備玩家數量需等於總玩家數');
         }
 
         this.phase.start();
         this.continue();
-    }
-
-    onDay() {
-        this.channel.send(this.deathLog.log);
-        this.deathLog.reset();
-        this.votes.clear();
-        this.ready.clear();
     }
 
     continue() {
@@ -131,31 +121,29 @@ class Game {
         }
 
         const message = this.phase.message;
-        const ms = this.phase.properties.skip ? 2.5 * 1000 : this.config.waitSeconds * 1000;
+        const waitMS = this.phase.properties.skip ? this.config.skipSeconds * 1000 : this.config.waitSeconds * 1000;
 
         if (message.start !== '') {
-            const prompt = this.phase.properties.character ? `, 有${this.config.waitSeconds}秒可以使用技能` : '';
+            const prompt = this.phase.properties.character ? `, 有${this.config.waitSeconds}秒可以使用/skill` : ''; // 是某角色睜眼時外加使用技能提示
             this.channel.send(`${message.start}` + prompt);
         }
 
-        if (this.phase.state === GamePhaseDefinitions.Day) {
-            this.onDay();
+        if (this.phase.properties.manual) {
+            this.phase.properties.on.bind(this)(); // TODO: 到底要不要傳game過去
         }
 
-        const timerId = setTimeout(() => {
+        const timerId = setTimeout(() => { // 自動往下個階段移動
             if (message.end !== '') {
                 this.channel.send(message.end);
             }
 
             this.phase.next();
             this.continue();
-        }, ms);
+        }, waitMS);
 
-        if (this.phase.properties.wait) {
+        if (this.phase.properties.manual) {
             clearTimeout(timerId);
         }
-
-        // TODO: 等待白天討論 -> 進投票
     }
 }
 

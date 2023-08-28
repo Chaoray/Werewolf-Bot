@@ -2,35 +2,36 @@
 class GameConfig {
     static Default = new GameConfig();
 
-    types = [];
-    counts = {};
+    characterTypes = []; // TODO: 計畫改掉types?
+    numberOfCharacters = {}; // 每個角色的數量
     waitSeconds = 15;
-    total = 0;
+    skipSeconds = 2.5;
+    totalCharacterCount = 0;
 
     /**
      * constructor
-     * @param {string} types any combination of types of CharacterDefines and so on
+     * @param {Array} types 任何角色定義的組合陣列
      */
     constructor(types) {
-        this.types = types ? types : this.types;
+        this.characterTypes = types ? types : this.characterTypes;
 
-        for (const type of this.types) {
-            this.counts[type] = 0;
+        for (const type of this.characterTypes) {
+            this.numberOfCharacters[type] = 0;
         }
     }
 
     set(type, count) {
         if (count > 0) {
-            if (this.types.includes(type)) {
-                this.counts[type] = count;
+            if (this.characterTypes.includes(type)) {
+                this.numberOfCharacters[type] = count;
             } else {
-                this.types.push(type);
-                this.counts[type] = count;
+                this.characterTypes.push(type);
+                this.numberOfCharacters[type] = count;
             }
         } else {
-            if (this.types.includes(type)) {
-                delete this.counts[type];
-                this.types = this.types.filter((t) => t !== type);
+            if (this.characterTypes.includes(type)) {
+                delete this.numberOfCharacters[type];
+                this.characterTypes = this.characterTypes.filter((t) => t !== type);
             }
         }
 
@@ -38,20 +39,20 @@ class GameConfig {
     }
 
     /**
-     * count the number of characters
+     * 計算角色總數
      * @return {number} the number of characters
      */
     count() {
         this.total = 0;
-        for (const type of this.types) {
-            this.total += this.counts[type];
+        for (const type of this.characterTypes) {
+            this.totalCharacterCount += this.numberOfCharacters[type];
         }
 
-        return this.total;
+        return this.totalCharacterCount;
     }
 
     clear() {
-        this.types = [];
+        this.characterTypes = [];
         this.counts = {};
         this.total = 0;
     }
@@ -62,8 +63,8 @@ class GameConfig {
      */
     toList() {
         const list = [];
-        for (const type of this.types) {
-            for (let i = 0; i < this.counts[type]; i++) {
+        for (const type of this.characterTypes) {
+            for (let i = 0; i < this.numberOfCharacters[type]; i++) {
                 list.push(type);
             }
         }
