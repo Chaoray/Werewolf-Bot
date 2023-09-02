@@ -1,5 +1,5 @@
 import { Manager } from './Base.js';
-import { Character } from './Character.js';
+import { Character } from './Characters/Character.js';
 
 class Player {
     id = '';

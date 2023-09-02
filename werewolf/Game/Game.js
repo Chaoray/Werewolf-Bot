@@ -1,65 +1,12 @@
 import { nanoid } from 'nanoid';
-import { Manager } from './Base.js';
-import { CharacterClasses } from './Character.js';
+import { CharacterClasses } from '../Characters/CharacterRouter.js';
 import { GameConfig } from './GameConfig.js';
-import { PlayerManager } from './Player.js';
-import { GamePhaseManager } from './GamePhase.js';
-import { VoteManager } from './VoteManager.js';
+import { PlayerManager } from '../Player.js';
+import { GamePhaseManager } from '../GamePhase.js';
+import { VoteManager } from '../VoteManager.js';
+import { DeathLog } from './DeathLog.js';
+import { ReadyManager } from './ReadyManager.js';
 
-class ReadyManager extends Manager {
-    get count() {
-        return Object.keys(this.filter((r) => r)).length;
-    }
-
-    /**
-     * 讓玩家準備
-     * @param {string} id player id
-     * @param {boolean} state 準備狀態
-     */
-    setState(id, state) {
-        this.set(id, state);
-    }
-}
-
-class DeathLog {
-    death = new Manager();
-
-    get log() {
-        let result = '';
-        this.death.forEach((player) => {
-            result += `<@${player.id}> 死了\n`;
-        });
-
-        /*
-        例：
-        @PlayerA 死了
-        @PlayerB 死了
-        @PlayerC 死了
-        */
-
-        if (this.death.length === 0) result = '昨晚是平安夜';
-
-        return result;
-    }
-
-    reset() {
-        this.death.clear();
-    }
-
-    /**
-     * @param {Player} player player instance
-     */
-    add(player) {
-        this.death.add(player.id, player);
-    }
-
-    /**
-     * @param {Player} player player instance
-     */
-    remove(player) {
-        this.death.remove(player.id);
-    }
-}
 
 class Game {
     id;
@@ -129,7 +76,8 @@ class Game {
         }
 
         if (this.phase.properties.manual) {
-            this.phase.properties.on.bind(this)(); // TODO: 到底要不要傳game過去
+            this.phase.properties.on.bind(this)();
+            // TODO: 傳game
         }
 
         const timerId = setTimeout(() => { // 自動往下個階段移動

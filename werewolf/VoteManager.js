@@ -32,12 +32,14 @@ class VoteManager extends Manager {
             }
         }
 
-        // 附註：可以隨機選 / 重新投
-        // 目前是隨機選
+        // 如果有相同票數，目前是隨機選擇
 
         return res;
     }
 }
+
+// TODO: await式投票
+// 投票結束後返回結果(resolve)
 
 export {
     VoteManager

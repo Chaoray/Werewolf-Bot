@@ -1,6 +1,4 @@
-import { CharacterDefinitions } from './CharacterDefinitions.js';
-
-// TODO: 讓這裡變得好看億點
+import { CharacterDefinitions } from '../Characters/CharacterDefinitions.js';
 
 const GamePhaseDefinitions = Object.freeze({
     'Idle': Symbol('Idle'),
@@ -17,7 +15,7 @@ const GamePhaseDefinitions = Object.freeze({
     'Voting': Symbol('Voting'),
 });
 
-const GamePhaseProperties = Object.freeze({ // on function 這裡會綁定this成game，可以到Game.js的continue()看
+const GamePhaseProperties = Object.freeze({
     [GamePhaseDefinitions.Night]: {
         skip: true,
     },

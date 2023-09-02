@@ -1,4 +1,3 @@
-
 class Manager {
     items = new Map();
 
